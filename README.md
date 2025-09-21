@@ -45,16 +45,11 @@ Then open your browser at:
 👉 http://127.0.0.1:5000
 
 📸 Screenshots
-(add these after you run locally — take screenshots and drag-drop into GitHub Readme)
 
-Upload Box
-Results (with progress bar + highlights)
-📺 Demo Video
-Watch here (insert YouTube or Google Drive link to your 3‑minute demo video)
+
 
 🔗 Prototype Link
-If hosted on Render/Heroku/Streamlit:
-https://misinfo-checker.onrender.com
+
 
 💡 Future Scope
 Multilingual misinformation detection
