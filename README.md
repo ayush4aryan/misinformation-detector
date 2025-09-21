@@ -49,7 +49,10 @@ Then open your browser at:
 
 
 🔗 Prototype Link
+## 🌍 Live Prototype
+[👉 Try it here](https://misinformation-detector-z9g0.onrender.com/)
 
+*(Best viewed on desktop browser)*
 
 💡 Future Scope
 Multilingual misinformation detection
