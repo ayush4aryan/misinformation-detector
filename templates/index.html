@@ -3,113 +3,113 @@
 <head>
   <meta charset="utf-8">
   <title>Misinformation Detector</title>
-
-  <!-- Bootstrap -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Google Font for a modern look -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .card-glass {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .highlight-danger {
-      background: #ffdddd;
-      color: #d9534f;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 6px;
-    }
-
-    .progress {
-      height: 30px;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      font-weight: bold;
-      font-size: 14px;
-      animation: widen 1.5s ease;
-    }
-
-    @keyframes widen {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-
-    h1 {
-      font-weight: 800;
-      color: white;
-      text-shadow: 0px 2px 10px rgba(0,0,0,0.2);
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="text-center mb-5">🕵️ Misinformation Checker</h1>
+  <div class="container py-5">
+    <h1 class="text-center mb-4">🕵️ Misinformation Checker</h1>
 
-    <!-- Input -->
-    <div class="card card-glass p-4 mb-5">
+    <!-- Input Form -->
+    <div class="card shadow-sm p-4 mb-4">
       <form method="POST">
-        <div class="mb-3">
-          <textarea name="user_text" class="form-control shadow-sm" rows="6"
-            placeholder="Paste text or article here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-dark w-100">🚀 Analyze</button>
+        <textarea name="user_text" class="form-control mb-3" rows="6"
+          placeholder="Paste text or article here..."></textarea>
+        <button type="submit" class="btn btn-primary w-100">🚀 Analyze</button>
       </form>
     </div>
 
-    <!-- Results -->
+    <!-- Results Section -->
     {% if result %}
-    <div class="card card-glass p-4">
-      <h2 class="mb-4">Results</h2>
+    <div class="card shadow-sm p-4 mt-4">
+      <h3 class="text-center mb-4">Results</h3>
 
-      <!-- Animated Progress Score -->
-      <div class="progress mb-4">
-        <div class="progress-bar 
-            {% if result.score < 30 %} bg-success
-            {% elif result.score < 70 %} bg-warning
-            {% else %} bg-danger
-            {% endif %}"
-            role="progressbar"
-            style="width: {{ result.score }}%;">
-          {{ result.score }}%
+      <!-- Score Gauge -->
+      <div class="d-flex flex-column align-items-center mb-4">
+        <div class="score-wrapper">
+          <canvas id="scoreChart"></canvas>
+          <div class="score-text">{{ result.score }}%</div>
+        </div>
+
+        <!-- Risk Badge -->
+        <div class="mt-3">
+          {% if result.score < 30 %}
+            <span class="badge rounded-pill bg-success fs-5">✔️ Safe</span>
+          {% elif result.score < 70 %}
+            <span class="badge rounded-pill bg-warning text-dark fs-5">⚠️ Medium Risk</span>
+          {% else %}
+            <span class="badge rounded-pill bg-danger fs-5">❌ High Risk</span>
+          {% endif %}
         </div>
       </div>
 
-      <p><strong>Flagged Terms:</strong>
-        {% if result.flagged_words %}
-          <span class="badge bg-danger">{{ result.flagged_words | join(", ") }}</span>
-        {% else %}
-          <span class="badge bg-success">None 🚀</span>
-        {% endif %}
-      </p>
+      <hr>
 
-      <p><strong>Source Check:</strong> {{ result.source_status }}</p>
+      <!-- Flagged Terms -->
+      <p><strong>Flagged Terms:</strong></p>
+      <div>
+        {% if result.flagged_words %}
+          {% for word in result.flagged_words %}
+            <span class="badge flagged-term">⚠️ {{ word }}</span>
+          {% endfor %}
+        {% else %}
+          <span class="badge rounded-pill bg-success">✔️ None detected</span>
+        {% endif %}
+      </div>
 
       <hr>
+
+      <!-- Source Check -->
+      <p><strong>Source Check:</strong></p>
+      {% if "Trusted" in result.source_status %}
+        <span class="badge rounded-pill bg-success">✅ {{ result.source_status }}</span>
+      {% elif "Unverified" in result.source_status %}
+        <span class="badge rounded-pill bg-warning text-dark">⚠️ {{ result.source_status }}</span>
+      {% else %}
+        <span class="badge rounded-pill bg-danger">❌ {{ result.source_status }}</span>
+      {% endif %}
+
+      <hr>
+
+      <!-- Highlighted Text -->
       <h5>Analyzed Text:</h5>
-      <div class="p-3 rounded bg-white shadow-sm text-dark" style="white-space: pre-wrap;">
+      <div class="text-output">
         {{ result.highlighted_text|safe }}
       </div>
     </div>
     {% endif %}
   </div>
+
+  <!-- Chart.js Script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    {% if result %}
+    const ctx = document.getElementById('scoreChart');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [{{ result.score }}, {{ 100 - result.score }}],
+          backgroundColor: [
+            {% if result.score < 30 %}
+               'rgba(40, 167, 69, 0.9)',
+            {% elif result.score < 70 %}
+               'rgba(255, 193, 7, 0.9)',
+            {% else %}
+               'rgba(220, 53, 69, 0.9)',
+            {% endif %}
+            'rgba(220, 220, 220, 0.2)'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: { legend: { display: false }}
+      }
+    });
+    {% endif %}
+  </script>
 </body>
 </html>

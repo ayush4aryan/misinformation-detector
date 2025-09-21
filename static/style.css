@@ -1,0 +1,51 @@
+body {
+  background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+h1, h3, h5, p, strong {
+  color: #222;
+}
+
+.card {
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.score-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+.score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Flagged Terms */
+.flagged-term {
+  background: #ff4d4d;
+  color: #fff !important;
+  margin: 2px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.9em;
+}
+
+/* Analyzed Text Output Box */
+.text-output {
+  white-space: pre-wrap;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  font-family: monospace;
+  color: #333;
+}
